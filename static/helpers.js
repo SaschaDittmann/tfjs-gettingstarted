@@ -2,6 +2,22 @@ function getRndInteger(min, max) {
 	return Math.floor(Math.random() * (max - min) ) + min;
 }
 
+function getRndFloat(min, max) {
+	return Math.random() * (max - min) + min;
+}
+
+function getRndFloatG(min, max, v) {
+	return randomG(v) * (max - min) + min;
+}
+
+function randomG(v){ 
+    var r = 0;
+    for(var i = v; i > 0; i --){
+        r += Math.random();
+    }
+    return r / v;
+}
+
 function average(data){
 	var sum = data.reduce(function(sum, value){
 		return sum + value;

@@ -1,4 +1,5 @@
-$("#simple-regression-button").click(async function () {
+$("#linear-regression").click(async function () {
+	$("#example-title").text("Linear Regression");
 	const num_house = 160
 	
 	// Generate Demo Data
@@ -14,8 +15,6 @@ $("#simple-regression-button").click(async function () {
 		const house_size = getRndInteger(1000, 3500);
 		const house_price = house_size * 100.0 + getRndInteger(20000, 70000);
 
-		
-		
 		plot_houses.push({x: house_size, y: house_price});
 		if (i < num_train_samples) {
 			plot_houses_train.push({x: house_size, y: house_price});
@@ -126,6 +125,70 @@ $("#simple-regression-button").click(async function () {
 			xLabel: 'Size',
 			yLabel: 'Price'
 		});
+});
+
+$("#single-neuron").click(async function () {
+	$("#example-title").text("Single Neuron");
+    const num_data_points = 1000;
+    const data_points_factor = 4;
+
+    const plot_series1_values = [];
+    const plot_series2_values = [];
+    for(var i = 0; i < num_data_points; i++) {
+        if (i % 2 == 0){
+            const x_point = getRndFloatG(-4.0, 2.0, data_points_factor);
+            const y_point = getRndFloatG(-6.0, 1.0, data_points_factor);
+            plot_series1_values.push({ x: x_point, y: y_point });
+        } else {
+            const x_point = getRndFloatG(-3.0, 3.0, data_points_factor);
+            const y_point = getRndFloatG(-12.0, -5.0, data_points_factor);
+            plot_series2_values.push({ x: x_point, y: y_point });
+        }
+    }
+
+    tfvis.render.scatterplot(
+        { name: 'Single Neuron Data Points', tab: 'Charts' },
+        { values: [plot_series1_values, plot_series2_values], series: ['series 1', 'series 2'] },
+        {
+            width: 400
+        }
+    );
+});
+
+$("#deep-circles").click(async function () {
+	$("#example-title").text("Deep Circles");
+    const num_data_points = 1000;
+    const data_points_factor = 2;
+
+    const plot_series1_values = [];
+    const plot_series2_values = [];
+    const num_series_data_point = Math.floor(num_data_points / 2);
+    var i = 0;
+    while(i < num_data_points) {
+        if (i % 2 == 0){
+            if (plot_series1_values.length > num_series_data_point) continue;
+            const x_point = getRndFloatG(-1.7, 1.7, data_points_factor);
+            const y_point = getRndFloatG(-1.7, 1.7, data_points_factor);
+            if (x_point < -0.8 || x_point > 0.8 || y_point < -0.8 || y_point > 0.8) {
+                plot_series1_values.push({ x: x_point, y: y_point });
+                i++;
+            }
+        } else {
+            if (plot_series2_values.length > num_series_data_point) continue;
+            const x_point = getRndFloatG(-1.0, 1.0, data_points_factor);
+            const y_point = getRndFloatG(-1.0, 1.0, data_points_factor);
+            plot_series2_values.push({ x: x_point, y: y_point });
+            i++;
+        }
+    }
+
+    tfvis.render.scatterplot(
+        { name: 'Deep Circles Data Points', tab: 'Charts' },
+        { values: [plot_series1_values, plot_series2_values], series: ['series 1', 'series 2'] },
+        {
+            width: 400
+        }
+    );
 });
 
 $( document ).ready(async function () {
