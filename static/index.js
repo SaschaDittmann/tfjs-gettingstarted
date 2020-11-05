@@ -55,13 +55,7 @@ $("#linear-regression").click(async function () {
 			xLabel: 'Size',
 			yLabel: 'Price'
 		});
-
-	// Normalise Data
-	const train_house_sizes_norm = normalize(train_house_sizes);
-	const train_house_prices_norm = normalize(train_house_prices);
-	const test_house_sizes_norm = normalize(test_house_sizes);
-	const test_house_prices_norm = normalize(test_house_prices);
-
+	
 	const train_tensors = {
 		houseSizes: tf.tensor2d(train_house_sizes, [train_house_sizes.length, 1]),
 		housePrices: tf.tensor2d(train_house_prices, [train_house_prices.length, 1])
@@ -70,47 +64,53 @@ $("#linear-regression").click(async function () {
 		houseSizes: tf.tensor2d(test_house_sizes, [test_house_sizes.length, 1]),
 		housePrices: tf.tensor2d(test_house_prices, [test_house_prices.length, 1])
 	};
-	
-	const model = tf.sequential();
 
+	// define model structure
+	const model = tf.sequential();
 	// housePrices = kernel * houseSizes + bias
-	model.add(tf.layers.dense({ inputShape: [1], units: 1 }));
-	
+	model.add(tf.layers.dense({ inputShape: [1], units: 1, activation: 'linear' }));
+
+	// define loss function and optimizer
 	// meanAbsoluteError = average( absolute(modelOutput - targets) )
 	model.compile({
-		optimizer: tf.train.sgd(0.001), 
+		optimizer: tf.train.sgd(0.001),
 		loss: 'meanAbsoluteError'
 	});
 
-	// Setup trainings visulisation
-	const metrics = ['loss', 'val_loss', 'acc', 'val_acc']
-	const container = { 
-		name: 'Model Training', 
-		styles: { 
-			 height: '1000px' 
-		}};
-	const fitCallbacks = tfvis.show.fitCallbacks(container, metrics)
+	// setup training visulisation
+	const metrics = ['loss', 'val_loss', 'acc', 'val_acc'];
+	const container = {
+		name: 'Model Training',
+		styles: {
+			height: '1000px'
+		}
+	};
+	const fitCallbacks = tfvis.show.fitCallbacks(container, metrics);
 
+	// training the model
 	await model.fit(
-		train_tensors.houseSizes, 
-		train_tensors.housePrices, 
+		train_tensors.houseSizes,
+		train_tensors.housePrices,
 		{
 			validationData: [test_tensors.houseSizes, test_tensors.housePrices],
 			epochs: 20,
 			shuffle: true,
 			callbacks: fitCallbacks
-		});
-	
+		}
+	);
+
+	// test the model
 	const evalOutput = await model.evaluate(test_tensors.houseSizes, test_tensors.housePrices).data();
-    console.log(
-        `Evaluation results:\n` +
+	console.log(
+		`Evaluation results:\n` +
 		`  Loss = ${evalOutput}`);
-	
+
+	// visulize model
 	const plot_predictions = [];
-	for	(var house_size=500; house_size<=4000; house_size+=100){
+	for(var house_size = 500; house_size <= 4000; house_size+=100){
 		const house_price_pred = await model.predict(tf.tensor2d([[house_size]])).data();
 		plot_predictions.push({
-			x: house_size, 
+			x: house_size,
 			y: house_price_pred
 		});
 	}
