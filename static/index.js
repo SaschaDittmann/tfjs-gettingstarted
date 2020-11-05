@@ -1,8 +1,10 @@
 $("#linear-regression").click(async function () {
 	$("#example-title").text("Linear Regression");
+	$("#output-log").empty();
 	const num_house = 160
 	
 	// Generate Demo Data
+	$("#output-log").append(`<li>Generating demo data</li>`);
 	const plot_houses = [];
 	const plot_houses_train = [];
 	const plot_houses_test = [];
@@ -56,6 +58,7 @@ $("#linear-regression").click(async function () {
 			yLabel: 'Price'
 		});
 	
+	$("#output-log").append(`<li>Converting demo data to tensors</li>`);
 	const train_tensors = {
 		houseSizes: tf.tensor2d(train_house_sizes, [train_house_sizes.length, 1]),
 		housePrices: tf.tensor2d(train_house_prices, [train_house_prices.length, 1])
@@ -66,18 +69,20 @@ $("#linear-regression").click(async function () {
 	};
 
 	// define model structure
+	$("#output-log").append(`<li>Defining model structure</li>`);
 	const model = tf.sequential();
 	// housePrices = kernel * houseSizes + bias
 	model.add(tf.layers.dense({ inputShape: [1], units: 1, activation: 'linear' }));
 
 	// define loss function and optimizer
+	$("#output-log").append(`<li>Defining loss function and optimizer</li>`);
 	// meanAbsoluteError = average( absolute(modelOutput - targets) )
 	model.compile({
 		optimizer: tf.train.sgd(0.001),
 		loss: 'meanAbsoluteError'
 	});
 
-	// setup training visulisation
+	// setup training visualisation
 	const metrics = ['loss', 'val_loss', 'acc', 'val_acc'];
 	const container = {
 		name: 'Model Training',
@@ -88,6 +93,7 @@ $("#linear-regression").click(async function () {
 	const fitCallbacks = tfvis.show.fitCallbacks(container, metrics);
 
 	// training the model
+	$("#output-log").append(`<li>Training the model</li>`);
 	await model.fit(
 		train_tensors.houseSizes,
 		train_tensors.housePrices,
@@ -99,13 +105,16 @@ $("#linear-regression").click(async function () {
 		}
 	);
 
-	// test the model
+	// evaluate the model
+	$("#output-log").append(`<li>Evaluating the model</li>`);
 	const evalOutput = await model.evaluate(test_tensors.houseSizes, test_tensors.housePrices).data();
 	console.log(
 		`Evaluation results:\n` +
 		`  Loss = ${evalOutput}`);
+	$("#output-log").append(`<li>Evaluation results:<br/>Loss = ${evalOutput}</li>`);
 
-	// visulize model
+	// visualise the model
+	$("#output-log").append(`<li>Visualising the model</li>`);
 	const plot_predictions = [];
 	for(var house_size = 500; house_size <= 4000; house_size+=100){
 		const house_price_pred = await model.predict(tf.tensor2d([[house_size]])).data();
@@ -125,6 +134,7 @@ $("#linear-regression").click(async function () {
 			xLabel: 'Size',
 			yLabel: 'Price'
 		});
+	$("#output-log").append(`<li>Completed demo successfully</li>`);
 });
 
 $("#single-neuron").click(async function () {
