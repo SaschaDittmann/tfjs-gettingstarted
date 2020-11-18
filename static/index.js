@@ -115,25 +115,55 @@ $("#linear-regression").click(async function () {
 
 	// visualise the model
 	$("#output-log").append(`<li>Visualising the model</li>`);
-	const plot_predictions = [];
+	const pred_house_sizes = [];
+	const pred_house_prices = [];
 	for(var house_size = 500; house_size <= 4000; house_size+=100){
 		const house_price_pred = await model.predict(tf.tensor2d([[house_size]])).data();
-		plot_predictions.push({
-			x: house_size,
-			y: house_price_pred
-		});
+		pred_house_sizes.push(house_size);
+		pred_house_prices.push(house_price_pred[0]);
 	}
-	tfvis.render.linechart(
-		{ name: 'Predictions', tab: 'Charts' },
-		{ values: [plot_predictions], series: ['model'] },
-		{
-			width: 400,
-			height: 300,
-			xAxisDomain: [500, 4000],
-			yAxisDomain: [100000, 450000],
-			xLabel: 'Size',
-			yLabel: 'Price'
-		});
+	console.log(pred_house_sizes);
+	console.log(pred_house_prices);
+	var train_houses = {
+		x: train_house_sizes,
+		y: train_house_prices,
+		mode: 'markers',
+		type: 'scatter',
+		name: 'train'
+	  };
+	  
+	var test_houses = {
+		x: test_house_sizes,
+		y: test_house_prices,
+		mode: 'markers',
+		type: 'scatter',
+		name: 'test'
+	  };
+	var pred_houses = {
+		x: pred_house_sizes,
+		y: pred_house_prices,
+		mode: 'lines',
+		type: 'scatter',
+		name: 'model'
+	  };
+	  
+	var data = [ train_houses, test_houses, pred_houses ];
+	  
+	var layout = {
+		autosize: false,
+  		width: 500,
+		xaxis: {
+			title: 'Size',
+			range: [500, 4000]
+		},
+		yaxis: {
+			title: 'Price',
+			range: [100000, 450000]
+		},
+		title:'Linear Regression Model'
+		};
+	  
+	Plotly.newPlot('result-chart', data, layout);
 	$("#output-log").append(`<li>Completed demo successfully</li>`);
 });
 
