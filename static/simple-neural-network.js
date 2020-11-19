@@ -1,5 +1,5 @@
 $("#simple-neural-network").click(async function () {
-	$("#example-title").text("Deep Circles");
+	$("#example-title").text("Simple Neural Network");
     $("#output-log").empty();
     const num_data_points = 1000;
     const data_points_factor = 2;
@@ -115,6 +115,98 @@ $("#simple-neural-network").click(async function () {
 	`Loss = ${evalOutput[0].dataSync()[0].toFixed(3)}<br/>`+
 	`Accuracy = ${evalOutput[1].dataSync()[0].toFixed(3)}`+
 	`</li>`);
-	
+
+	// visualise the model
+	$("#output-log").append(`<li>Visualising the model</li>`);
+	const pred_x = [];
+	const pred_y = [];
+	const pred_y_hat = [];
+	for(var x = -2.0; x <= 2.0; x+=0.2){
+		for(var y = -2.0; y <= 2.0; y+=0.2){
+			const y_hat = await model.predict(tf.tensor2d([[x, y]])).data();
+			pred_x.push(x);
+			pred_y.push(y);
+			pred_y_hat.push(y_hat[0]);
+		}
+	}
+
+	const train_series1_x = []
+	const train_series1_y = []
+	const test_series1_x = []
+	const test_series1_y = []
+	const train_series2_x = []
+	const train_series2_y = []
+	const test_series2_x = []
+	const test_series2_y = []
+	for(var i = 0; i < train_x.length; i++) {
+		if (train_y[i] == 0){
+			train_series1_x.push(train_x[i][0]);
+			train_series1_y.push(train_x[i][1]);
+		} else {
+			train_series2_x.push(train_x[i][0]);
+			train_series2_y.push(train_x[i][1]);
+		}
+	}
+	for(var i = 0; i < test_x.length; i++) {
+		if (test_y[i] == 0){
+			test_series1_x.push(test_x[i][0]);
+			test_series1_y.push(test_x[i][1]);
+		} else {
+			test_series2_x.push(test_x[i][0]);
+			test_series2_y.push(test_x[i][1]);
+		}
+	}
+
+	var train_markers_series1 = {
+		x: train_series1_x,
+		y: train_series1_y,
+		mode: 'markers',
+		type: 'scatter',
+		name: 'train series 1'
+		};
+	var train_markers_series2 = {
+		x: train_series2_x,
+		y: train_series2_y,
+		mode: 'markers',
+		type: 'scatter',
+		name: 'train series 2'
+		};
+	var test_markers_series1 = {
+		x: test_series1_x,
+		y: test_series1_y,
+		mode: 'markers',
+		type: 'scatter',
+		name: 'test series 1'
+		};
+	var test_markers_series2 = {
+		x: test_series2_x,
+		y: test_series2_y,
+		mode: 'markers',
+		type: 'scatter',
+		name: 'test series 2'
+		};
+	var model_contour = {
+		x: pred_x,
+		y: pred_y,
+		z: pred_y_hat,
+		type: 'contour'
+	}
+		
+	var data = [ 
+		train_markers_series1, 
+		test_markers_series1, 
+		train_markers_series2, 
+		test_markers_series2, 
+		model_contour,
+	];
+		
+	var layout = {
+		autosize: false,
+		width: 500,
+		showlegend: false,
+		title:'Simple Neural Network Model'
+		};
+		
+	Plotly.newPlot('result-chart', data, layout);
 	$("#output-log").append(`<li>Completed demo successfully</li>`);
 });

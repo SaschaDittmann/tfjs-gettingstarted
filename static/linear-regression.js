@@ -122,8 +122,7 @@ $("#linear-regression").click(async function () {
 		pred_house_sizes.push(house_size);
 		pred_house_prices.push(house_price_pred[0]);
 	}
-	console.log(pred_house_sizes);
-	console.log(pred_house_prices);
+
 	var train_houses = {
 		x: train_house_sizes,
 		y: train_house_prices,
